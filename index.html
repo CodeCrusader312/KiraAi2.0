@@ -320,11 +320,17 @@ Really… thank you, ${herName}. 💖`);
 
     function logAnswerToGoogleSheet(question, answer) {
   const url = "https://script.google.com/macros/s/AKfycbxyRkwUKaTK-BB_-0oDjwPVQeVnccqKj9BwV4K8j3hWhTV2Lzsc7lsGHsb6AHV9qzCHNw/exec";
-  const params = new URLSearchParams({ question, answer });
-  fetch(`${url}?${params}`)
-    .then((res) => res.text())
-    .then((res) => console.log("✅ Logged to Google Sheets:", res))
-    .catch((err) => console.error("❌ GET logging failed:", err));
+
+  fetch(url, {
+    method: "POST",
+    mode: "no-cors", // this prevents CORS error, but you won't see response text
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ question, answer }),
+  })
+  .then(() => console.log("✅ Logged to Google Sheets"))
+  .catch((err) => console.error("❌ POST logging failed:", err));
 }
 
     document.getElementById("userInput").addEventListener("keydown", e => {
