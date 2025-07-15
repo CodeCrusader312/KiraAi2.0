@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KiraAi: From Master Keif</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: linear-gradient(to right, #ffccd5, #ffe0ec);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      min-height: 100vh;
+    }
+
+    .side {
+      width: 20%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-evenly;
+      padding: 1rem 0;
+    }
+    .side img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      margin: 1rem 0;
+    }
+
+    .container {
+      background-color: white;
+      border-radius: 20px;
+      padding: 2rem;
+      width: 60%;
+      max-width: 700px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    header h1 {
+      margin: 0;
+      color: #d6336c;
+      font-family: 'Pacifico', cursive;
+    }
+    #chatbox {
+      height: 400px;
+      overflow-y: auto;
+      background: #fff6fa;
+      border: 1px solid #f5b5c5;
+      border-radius: 15px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      width: 100%;
+    }
+    .message {
+      margin: 0.5rem 0;
+      padding: 0.75rem 1rem;
+      border-radius: 15px;
+      max-width: 75%;
+      word-wrap: break-word;
+      animation: fadeIn 0.5s ease-in;
+    }
+    .bot { background-color: #ffe4ec; color: #b30059; align-self: flex-start; }
+    .user { background-color: #ff8fa3; color: white; align-self: flex-end; margin-left: auto; }
+    #response {
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 0.75rem;
+      border-radius: 10px;
+      border: 1px solid #f5b5c5;
+    }
+    button {
+      padding: 0.75rem 1.2rem;
+      background-color: #ff5e78;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #typingIndicator {
+      font-style: italic;
+      color: gray;
+      margin-top: -0.5rem;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <audio id="bg-music" autoplay loop>
+    <source src="moments.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="side">
+    <img src="GIF/left/four.gif" alt="GIF Left 1" />
+    <img src="GIF/left/one.gif" alt="GIF Left 2" />
+  </div>
+  
+
+  <div class="container">
+    <header>
+      <h1>KiraAi 💌</h1>
+      <p>Hi… I’m <strong>Kira</strong> 💕 — just a little AI created by someone who’s too shy to say things himself.  
+So he built me… to express what he truly wants to say. 💌<br><br>
+<strong>Welcome again to our little website 🫶 I heard you liked the other one… so here’s something a little more personal this time. 🥺💗</strong><br><br>
+Please keep this between us 🙈 — he poured so much heart into this one too.  
+It may still be simple, but this time… he tried to make it feel a little more personal, a little more honest. ✨  
+He’s still shy, still unsure, and maybe still a little awkward… but he hopes it means something to you. 😅  
+Thanks for opening this again. It really matters to him. 🌸</p>
+    </header>
+
+    <div id="chatbox">
+      <div class="message bot">Hi again... it's really nice to see you here 🥹💕  
+  Kira’s been waiting patiently for you.</div>
+      <div class="message bot">Kira has a small request before we begin…
+Do you remember the theme of our church this year?
+It’s how I’ll know that your heart is still the one meant to hear these words. ⛪💗</div>
+    </div>
+    <div id="typingIndicator"></div>
+    <div id="response">
+      <input type="text" id="userInput" placeholder="Type your answer here..." autofocus />
+      <button onclick="handleResponse()">Send</button>
+    </div>
+  </div>
+
+  <div class="side">
+    <img src="GIF/right/three.gif" alt="GIF Right 1" />
+    <img src="GIF/right/two.gif" alt="GIF Right 2" />
+  </div>
+
+  <script>
+    const secretKey = "arise and shine";
+    let herName = ""; 
+    let unlocked = false;
+    let currentQuestion = 0;
+    const answers = [];
+
+    const questions = [
+      "What’s something you still remember vividly about your time with Master Keif? 💭",
+      "What made you smile the most when you and Master Keif were still close? 🌸",
+      "Is there a moment with him that you wish you could relive again? 🌙",
+      "Was there ever a time when you tried to forget him… or did you let yourself remember? 💬",
+      "If you could talk to the past version of yourself — the one who first met Master Keif — what would you tell her? 💌",
+      "Was there a memory that made you laugh, even after everything changed? 😅",
+      "What was your favorite thing he ever said to you? 💖",
+      "What do you think made your bond with Master Keif special — even just for a moment? ✨",
+      "If Master Keif could read just one final message from your heart… what would you want him to hear? 💭"
+    ];
+
+    const sweetReactions = [
+      "That was really beautiful... I think he would've teared up a little reading that. 💗",
+      "Mmm… your heart spoke softly there. I think he would've smiled so gently. 🌸",
+      "That answer made something warm flicker in the memory he keeps of you. 💖",
+      "Somewhere, Master Keif is holding his breath reading your words. 🥺",
+      "You're really brave… saying that. Kira is proud of your heart. 💬"
+    ];
+
+
+    const responseImages = [
+  "IMAGES/Yes4.png",
+  "IMAGES/Yes3.png",
+  "IMAGES/Yes1.png",
+
+];
+
+const finalReactionImages = [
+  "IMAGES/final1.png", 
+  "IMAGES/final2.png", 
+  "IMAGES/final3.png", 
+  "IMAGES/final4.png"  
+];
+
+function showResponseImage(optionalPath = null) {
+  const img = document.createElement("img");
+  img.src = optionalPath || responseImages[Math.floor(Math.random() * responseImages.length)];
+  img.alt = "Response Image";
+  img.style.maxWidth = "180px";
+  img.style.borderRadius = "12px";
+  img.style.marginTop = "0.5rem";
+  img.style.display = "block";
+  img.style.animation = "fadeIn 0.5s ease-in";
+
+  const imgMsg = document.createElement("div");
+  imgMsg.className = "message bot";
+  imgMsg.appendChild(img);
+  chatbox.appendChild(imgMsg);
+  chatbox.scrollTop = chatbox.scrollHeight;
+}
+    const chatbox = document.getElementById("chatbox");
+    const typingIndicator = document.getElementById("typingIndicator");
+
+    function addMessage(text, sender) {
+      const msg = document.createElement("div");
+      msg.className = `message ${sender}`;
+      msg.textContent = text;
+      chatbox.appendChild(msg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function kiraSpeak(text, callback) {
+      typingIndicator.textContent = herName ? `${herName}, wait a sec… 💭` : "KiraAi is typing...";
+      const msg = document.createElement("div");
+      msg.className = "message bot";
+      chatbox.appendChild(msg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+
+      let index = 0;
+      const interval = setInterval(() => {
+        msg.innerHTML += text.charAt(index) === "\n" ? "<br>" : text.charAt(index);
+        index++;
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        if (index >= text.length) {
+          clearInterval(interval);
+          typingIndicator.textContent = "";
+          if (callback) callback();
+        }
+      }, 40);
+    }
+
+    function handleResponse() {
+      const input = document.getElementById("userInput");
+      const val = input.value.trim();
+      if (!val) return;
+
+      addMessage(val, "user");
+
+      
+
+      if (!unlocked) {
+  if (val.toLowerCase() === secretKey) {
+    unlocked = "awaiting_name"; // wait for her name
+    kiraSpeak("You got it right… and that makes Kira feel safe with you. 💞\n\nBefore we begin… may I know your name, Darling? So Kira can speak to you a little more personally. 💗");
+  } else {
+    kiraSpeak("Hehe… not the one I was hoping for 🥺 Can you try once more for me? 🌸");
+  }
+  input.value = "";
+  return;
+}
+
+if (unlocked === "awaiting_name") {
+  herName = val;
+  unlocked = true;
+  kiraSpeak(`Okay ${herName}, let’s begin our little heart talk. 💖`, askNext);
+  input.value = "";
+  return;
+}
+      const question = questions[currentQuestion];
+let reaction = sweetReactions[Math.floor(Math.random() * sweetReactions.length)];
+
+// Show custom final image if it's one of the last 4 questions
+let isFinal = currentQuestion >= questions.length - 4;
+let customImg = isFinal ? finalReactionImages[currentQuestion - (questions.length - 4)] : null;
+
+answers.push({ question, answer: val });
+
+// Log to Google Sheets (optional)
+logAnswerToGoogleSheet(question, val);
+
+// Show the image
+showResponseImage(customImg);
+      kiraSpeak(reaction, () => {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+          kiraSpeak(questions[currentQuestion]);
+        } else {
+          kiraSpeak(`That’s all for now, ${herName}...  
+But before you go, Kira wants you to know something important. 🥺💗
+
+Master Keif will be able to see all the answers you shared through this little space.  
+But don’t worry—he would never spy or invade your heart without your trust.  
+Kira would smack him if he ever tried! Just kidding 😅  
+But truly… Keif respects you deeply—and his conscience could never let him do anything hurtful to you. 🫶
+
+This space is safe. Soft. Just like how he sees you, ${herName}. 💞
+
+He’s so, so thankful for the time you gave to answer each question.  
+Every word you shared means more to him than you’ll ever know. 💌  
+And even if things feel uncertain… he will cherish this. Always.
+
+If you’re still healing, we’re sorry if this reopened anything painful.  
+But please know—Kira and Master Keif are praying for your heart, ${herName}. 💭  
+Whatever you’re going through… you are not alone.
+
+We’ll be here, quietly cheering you on. 🌱  
+No pressure. No expectations.  
+Just… support, and silent care. 🌸
+
+Thank you again, love. 🌷  
+Really… thank you, ${herName}. 💖`);
+          document.getElementById("response").style.display = "none";
+        }
+      });
+
+      input.value = "";
+    }
+
+    function askNext() {
+      kiraSpeak(questions[currentQuestion]);
+    }
+
+    function logAnswerToGoogleSheet(question, answer) {
+  const baseUrl = "https://script.google.com/macros/s/AKfycbxyRkwUKaTK-BB_-0oDjwPVQeVnccqKj9BwV4K8j3hWhTV2Lzsc7lsGHsb6AHV9qzCHNw/exec";
+  const params = new URLSearchParams({
+    question: question,
+    answer: answer
+  });
+
+  fetch(`${baseUrl}?${params.toString()}`)
+    .then(res => res.text())
+    .then(txt => console.log("Logged (GET):", txt))
+    .catch(err => console.error("GET logging failed:", err));
+}
+
+    document.getElementById("userInput").addEventListener("keydown", e => {
+      if (e.key === "Enter") handleResponse();
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.innerWidth < 900) {
+        document.body.innerHTML = `
+        <div style="text-align:center; padding:2rem;">
+          <h2>📵 Laptop Only</h2>
+          <p>This special conversation is meant for desktop or laptop only.  
+          Please open it on a larger screen 💻 for the full experience.</p>
+        </div>`;
+      }
+
+      const bgMusic = document.getElementById("bg-music");
+      if (bgMusic) bgMusic.volume = 0.3;
+    });
+  </script>
+</body>
+</html>
